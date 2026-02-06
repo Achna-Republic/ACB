@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <header style="text-align:center; margin-bottom:20px;">
+  <!-- Logo SVG -->
+  <svg width="100" height="100" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="75" cy="75" r="70" fill="#002b5b" stroke="#0066cc" stroke-width="5"/>
+    <circle cx="75" cy="75" r="50" fill="#00aaff" />
+    <text x="75" y="85" font-family="Arial, sans-serif" font-size="32" fill="white" text-anchor="middle" font-weight="bold">ACM</text>
+    <line x1="35" y1="35" x2="45" y2="45" stroke="white" stroke-width="2"/>
+    <line x1="115" y1="35" x2="105" y2="45" stroke="white" stroke-width="2"/>
+    <line x1="35" y1="115" x2="45" y2="105" stroke="white" stroke-width="2"/>
+    <line x1="115" y1="115" x2="105" y2="105" stroke="white" stroke-width="2"/>
+  </svg>
+  <h1>Achna Central Bank</h1>
+</header>
+<meta charset="UTF-8">
+<title>ACB Bank Dashboard</title>
+<style>
+body { font-family: Arial; background:#eef; padding:20px; }
+h1 { text-align:center; }
+.card { background:white; padding:15px; margin:10px 0; border-radius:8px; }
+input, button { width:100%; padding:8px; margin-top:5px; }
+button { background:#0066cc; color:white; border:none; border-radius:4px; }
+.danger button { background:red; }
+ul { background:white; padding:10px; border-radius:8px; }
+li { border-bottom:1px solid #ddd; padding:5px; }
+</style>
+</head>
+<body>
+
+<h1>🏦 Achna Central Bank (ACB)</h1>
+
+<div class="card">
+  <h2>Account</h2>
+  <p>Name: <span id="name">Tano Leo</span></p>
+  <p>Balance: <b><span id="balance">1000</span> ACM</b></p>
+</div>
+
+<div class="card">
+  <h3>Deposit (ငွေသွင်း)</h3>
+  <input id="damount" type="number" placeholder="Amount">
+  <button onclick="deposit()">Deposit</button>
+</div>
+
+<div class="card">
+  <h3>Transfer (ငွေလွှဲ)</h3>
+  <input id="to" placeholder="Target Account">
+  <input id="amount" type="number" placeholder="Amount">
+  <button onclick="transfer()">Send</button>
+</div>
+
+<div class="card">
+  <h3>Withdraw (ငွေထုတ်)</h3>
+  <input id="wamount" type="number" placeholder="Amount">
+  <button onclick="withdraw()">Withdraw</button>
+</div>
+
+<div class="card">
+  <h3>Settings (ဆက်တင်)</h3>
+  <input id="newname" placeholder="New Name">
+  <button onclick="changeName()">Save</button>
+</div>
+
+<div class="card danger">
+  <h3>Delete Account (အကောင့်ဖျက်)</h3>
+  <button onclick="deleteAccount()">Delete</button>
+</div>
+
+<h3>Transaction Log</h3>
+<ul id="log"></ul>
+
+<script>
+let user = {
+  id: 1,
+  name: "Tano Leo",
+  balance: 1000
+};
+
+function render() {
+  document.getElementById("name").innerText = user.name;
+  document.getElementById("balance").innerText = user.balance;
+}
+
+function log(text) {
+  let li = document.createElement("li");
+  li.innerText = text;
+  document.getElementById("log").prepend(li);
+}
+
+/* ===== Deposit ===== */
+function deposit() {
+  let amount = parseFloat(document.getElementById("damount").value);
+  if (amount <= 0) return alert("Invalid amount");
+
+  user.balance += amount;
+  log("DEPOSIT: " + amount);
+
+  // SQL:
+  /*
+  UPDATE users SET balance = balance + amount WHERE id = 1;
+  INSERT INTO transactions(user_id,type,amount)
+  VALUES(1,'DEPOSIT',amount);
+  */
+  render();
+}
+
+/* ===== Transfer ===== */
+function transfer() {
+  let to = document.getElementById("to").value;
+  let amount = parseFloat(document.getElementById("amount").value);
+
+  if (amount <= 0 || amount > user.balance) return alert("Invalid amount");
+
+  user.balance -= amount;
+  log("TRANSFER: " + amount + " to " + to);
+
+  // SQL:
+  /*
+  UPDATE users SET balance = balance - amount WHERE id = 1;
+  INSERT INTO transactions(user_id,type,amount,target_account)
+  VALUES(1,'TRANSFER',amount,to);
+  */
+  render();
+}
+
+/* ===== Withdraw ===== */
+function withdraw() {
+  let amount = parseFloat(document.getElementById("wamount").value);
+  if (amount <= 0 || amount > user.balance) return alert("Invalid amount");
+
+  user.balance -= amount;
+  log("WITHDRAW: " + amount);
+
+  // SQL:
+  /*
+  UPDATE users SET balance = balance - amount WHERE id = 1;
+  INSERT INTO transactions(user_id,type,amount)
+  VALUES(1,'WITHDRAW',amount);
+  */
+  render();
+}
+
+/* ===== Settings ===== */
+function changeName() {
+  let newName = document.getElementById("newname").value;
+  if (!newName) return alert("Enter name");
+
+  user.name = newName;
+  log("CHANGE NAME");
+
+  // SQL:
+  /*
+  UPDATE users SET full_name = newName WHERE id = 1;
+  */
+  render();
+}
+
+/* ===== Delete Account ===== */
+function deleteAccount() {
+  if (!confirm("Are you sure?")) return;
+  log("ACCOUNT DELETED");
+
+  // SQL:
+  /*
+  UPDATE users SET status='DELETED' WHERE id = 1;
+  */
+  document.body.innerHTML = "<h1>Account Deleted</h1>";
+}
+
+render();
+</script>
+
+</body>
+</html>
